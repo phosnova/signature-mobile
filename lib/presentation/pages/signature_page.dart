@@ -18,6 +18,7 @@ class _SignaturePageState extends State<SignaturePage> {
 
   @override
   void initState() {
+    getIt.call<SignBloc>().add(const SignEvent.started());
     signatureController = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
     super.initState();
   }
@@ -30,48 +31,77 @@ class _SignaturePageState extends State<SignaturePage> {
 
   Future<void> saveSignature(BuildContext context) async {
     final image = await signatureController.toPngBytes();
-    if (image != null) {
-      getIt<SignBloc>().add(SignEvent.save(image));
+
+    if (!mounted) return; // Cegah error jika widget sudah dispose
+
+    if (image == null || image.isEmpty) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Tanda Tangan Kosong'),
+              content: const Text('Silakan gambar tanda tangan terlebih dahulu sebelum menyimpan.'),
+              actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+            ),
+      );
+      return;
     }
+    getIt<SignBloc>().add(SignEvent.save(image));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Buat Tanda Tangan')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            width: double.infinity,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
-              child: Column(
-                children: [
-                  SignatureCanvas(signatureController: signatureController),
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 64.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.delete),
-                          label: const Text('Clear'),
-                          onPressed: () {
-                            signatureController.clear();
-                            getIt<SignBloc>().add(const SignEvent.clear());
-                          },
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.save),
-                          label: const Text('Simpan'),
-                          onPressed: () => saveSignature(context),
-                        ),
-                      ],
+      body: BlocListener<SignBloc, SignState>(
+        listener: (context, state) {
+          if (state.isSaved) {
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(content: Text(state.message ?? 'Berhasil Menyimpan Tanda Tangan')),
+            );
+          }
+          if (state.isFailure) {
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(content: Text(state.message ?? 'Gagal Menyimpan Tanda Tangan')),
+            );
+          }
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              width: double.infinity,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+                child: Column(
+                  children: [
+                    SignatureCanvas(signatureController: signatureController),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 64.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.delete),
+                            label: const Text('Clear'),
+                            onPressed: () {
+                              signatureController.clear();
+                              getIt<SignBloc>().add(const SignEvent.clear());
+                            },
+                          ),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.save),
+                            label: const Text('Simpan'),
+                            onPressed: () => saveSignature(context),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),

@@ -29,33 +29,37 @@ class SignBloc extends Bloc<SignEvent, SignState> {
   }
 
   Future<void> _handleStarted(Emitter<SignState> emit) async {
+    emit(state.copyWith(isInitial: true, message: "Mengambil Data Tanda Tangan..."));
     final image = await getSignature.call();
 
     if (image.isEmpty) {
-      emit(state.copyWith(savedSignatures: null, message: "Gagal Mendapatkan Data Tanda Tangan"));
+      emit(state.copyWith(savedSignatures: null, message: "Gagal Mendapatkan Data Tanda Tangan", isInitial: false));
       return;
     }
 
-    emit(state.copyWith(savedSignatures: image, isSaved: false, message: "Berhasil Mendapatkan Data Tanda Tangan"));
+    emit(
+      state.copyWith(
+        savedSignatures: image,
+        isSaved: false,
+        message: "Berhasil Mendapatkan Data Tanda Tangan",
+        isInitial: false,
+      ),
+    );
   }
 
   Future<void> _handleClear(Emitter<SignState> emit) async {
-    emit(state.copyWith(signatureImage: null, isSaved: false));
+    emit(state.copyWith(signatureImage: null, isSaved: false, isFailure: false));
   }
 
   Future<void> _handleSave(Emitter<SignState> emit, Uint8List imageBytes) async {
-    if (state.signatureImage == null) {
-      emit(state.copyWith(isSaved: false, message: 'Tanda Tangan Kosong'));
-      return;
-    }
-
-    final result = await saveSignature(state.signatureImage!);
+    final result = await saveSignature(imageBytes);
 
     if (!result) {
-      emit(state.copyWith(isSaved: false, message: 'Gagal Menyimpan Tanda Tangan'));
+      emit(state.copyWith(isSaved: false, message: 'Gagal Menyimpan Tanda Tangan', isFailure: true));
       return;
     }
 
-    emit(state.copyWith(isSaved: true, message: 'Tanda Tangan Berhasil Disimpan'));
+    final signatures = await getSignature.call();
+    emit(state.copyWith(savedSignatures: signatures, isSaved: true, message: 'Tanda Tangan Berhasil Disimpan'));
   }
 }

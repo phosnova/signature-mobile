@@ -5,9 +5,18 @@ class SignState with _$SignState {
   const factory SignState({
     required Uint8List? signatureImage,
     required bool isSaved,
+    required bool isInitial,
+    required bool isFailure,
     List<File>? savedSignatures,
     String? message,
   }) = _SignState;
 
-  factory SignState.initial() => SignState(signatureImage: null, isSaved: false, savedSignatures: [], message: null);
+  factory SignState.initial() => SignState(
+    signatureImage: null,
+    isInitial: false,
+    isSaved: false,
+    isFailure: false,
+    savedSignatures: [],
+    message: null,
+  );
 }
