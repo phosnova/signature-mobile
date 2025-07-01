@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
 
-import '../../domain/entities/repositories/signature_repository.dart';
+import '../../domain/repositories/signature_repository.dart';
 import '../datasources/signature_local_data_source.dart';
 
 @LazySingleton(as: SignatureRepository)

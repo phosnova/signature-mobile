@@ -6,7 +6,7 @@ part 'signature.freezed.dart';
 
 @freezed
 abstract class Signature with _$Signature {
-  const factory Signature({Uint8List? code}) = _Signature;
+  const factory Signature({Uint8List? imageBytes}) = _Signature;
 
   const Signature._(); // Private constructor
 }
