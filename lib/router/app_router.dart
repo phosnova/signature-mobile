@@ -10,6 +10,8 @@ class AppRouter {
 
   static const home = RouteItem(name: 'home', path: '/home');
 
+  static const signature = RouteItem(name: 'signature', path: '/signature');
+
   // Not Found Route
   static const notFound = RouteItem(name: 'not_found', path: '/not_found');
 

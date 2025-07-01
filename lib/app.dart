@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/app_config.dart';
 import 'core/themes/input_decoration_theme.dart';
+import 'injection.dart';
+import 'presentation/bloc/sign/sign_bloc.dart';
 import 'router/router.dart';
 
 class MyApp extends StatelessWidget {
@@ -10,15 +13,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: MyAppConfig.appName,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        inputDecorationTheme: inputDecorationTheme,
+    return MultiBlocProvider(
+      providers: [BlocProvider(create: (context) => getIt<SignBloc>()..add(const SignEvent.started()))],
+      child: MaterialApp.router(
+        title: MyAppConfig.appName,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          inputDecorationTheme: inputDecorationTheme,
+        ),
+        debugShowCheckedModeBanner: false, // default: true or other best partice: !kReleaseMode
+        routerConfig: goRouter,
+        // locale: const Locale('id', 'ID'),
       ),
-      debugShowCheckedModeBanner: false, // default: true or other best partice: !kReleaseMode
-      routerConfig: goRouter,
-      // locale: const Locale('id', 'ID'),
     );
   }
 }

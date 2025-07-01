@@ -5,6 +5,7 @@ import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/errors/not_found_page.dart';
 import '../presentation/pages/home_page.dart';
 import '../presentation/pages/profile_page.dart';
+import '../presentation/pages/signature_page.dart';
 import 'router_item.dart';
 
 part 'app_router.dart';
@@ -24,6 +25,11 @@ final goRouter = GoRouter(
       builder: (context, state) => const ProfilePage(),
     ),
     GoRoute(path: AppRouter.home.path, name: AppRouter.home.name, builder: (context, state) => const HomePage()),
+    GoRoute(
+      path: AppRouter.signature.path,
+      name: AppRouter.signature.name,
+      builder: (context, state) => const SignaturePage(),
+    ),
     GoRoute(
       path: AppRouter.notFound.path,
       name: AppRouter.notFound.name,
