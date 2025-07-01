@@ -1,15 +1,17 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-abstract class SignLocalDataSource {
+abstract class SignatureLocalDataSource {
   Future<bool> saveSignature(Uint8List imageBytes);
   Future<List<File>> getSavedSignatures();
   Future<bool> deleteSignature(String fileName);
 }
 
-class SignLocalDataSourceImpl implements SignLocalDataSource {
+@LazySingleton(as: SignatureLocalDataSource)
+class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
   static const _key = 'signature_files';
 
   Future<String> _getDirectoryPath() async {
