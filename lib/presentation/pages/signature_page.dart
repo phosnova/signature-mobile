@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:signature/signature.dart';
 
+import '../../core/enums/signature_status.dart';
 import '../../injection.dart';
 import '../bloc/sign/sign_bloc.dart';
 import 'signature_canvas.dart';
@@ -55,13 +56,13 @@ class _SignaturePageState extends State<SignaturePage> {
       appBar: AppBar(title: const Text('Buat Tanda Tangan')),
       body: BlocListener<SignBloc, SignState>(
         listener: (context, state) {
-          if (state.isSaved) {
+          if (state.status.isSuccess) {
             showDialog(
               context: context,
               builder: (_) => AlertDialog(content: Text(state.message ?? 'Berhasil Menyimpan Tanda Tangan')),
             );
           }
-          if (state.isFailure) {
+          if (state.status.isFailure) {
             showDialog(
               context: context,
               builder: (_) => AlertDialog(content: Text(state.message ?? 'Gagal Menyimpan Tanda Tangan')),
