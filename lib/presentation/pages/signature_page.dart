@@ -31,7 +31,7 @@ class _SignaturePageState extends State<SignaturePage> {
   Future<void> saveSignature(BuildContext context) async {
     final image = await signatureController.toPngBytes();
     if (image != null) {
-      getIt<SignBloc>().add(SignEvent.setImage(image));
+      getIt<SignBloc>().add(SignEvent.save(image));
     }
   }
 
