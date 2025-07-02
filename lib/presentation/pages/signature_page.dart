@@ -57,16 +57,12 @@ class _SignaturePageState extends State<SignaturePage> {
       body: BlocListener<SignBloc, SignState>(
         listener: (context, state) {
           if (state.status.isSuccess) {
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(content: Text(state.message ?? 'Berhasil Menyimpan Tanda Tangan')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Berhasil menyimpan tanda tangan')));
           }
           if (state.status.isFailure) {
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(content: Text(state.message ?? 'Gagal Menyimpan Tanda Tangan')),
-            );
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal menyimpan tanda tangan')));
           }
         },
         child: SafeArea(
@@ -101,6 +97,74 @@ class _SignaturePageState extends State<SignaturePage> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    const Text('Tanda Tangan Tersimpan', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: BlocBuilder<SignBloc, SignState>(
+                        builder: (context, state) {
+                          if (state.status == SignatureStatus.loading) {
+                            return const CircularProgressIndicator();
+                          }
+                          if (state.status == SignatureStatus.failure) {
+                            return Text('Tidak ada tanda tangan yang tersimpan');
+                          }
+                          if (state.savedSignatures != null) {
+                            return SizedBox(
+                              height: 500,
+                              child: ListView.builder(
+                                itemCount: state.savedSignatures!.length,
+                                itemBuilder: (context, index) {
+                                  final signature = state.savedSignatures![index];
+                                  return Card(
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.file(signature, fit: BoxFit.scaleDown),
+                                        ),
+                                        Positioned(
+                                          top: 4,
+                                          right: 4,
+                                          child: IconButton(
+                                            icon: const Icon(Icons.delete, color: Colors.red),
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (_) => AlertDialog(
+                                                      title: const Text('Hapus Tanda Tangan'),
+                                                      content: const Text('Yakin ingin menghapus tanda tangan ini?'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(context),
+                                                          child: const Text('Batal'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {},
+                                                          child: const Text(
+                                                            'Hapus',
+                                                            style: TextStyle(color: Colors.red),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                          return const Text('Belum ada tanda tangan yang tersimpan');
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),

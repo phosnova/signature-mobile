@@ -37,7 +37,7 @@ class SignBloc extends Bloc<SignEvent, SignState> {
       emit(
         state.copyWith(
           savedSignatures: null,
-          message: "Gagal Mendapatkan Data Tanda Tangan",
+          message: "Belum ada tanda tangan yang tersimpan",
           status: SignatureStatus.failure,
         ),
       );

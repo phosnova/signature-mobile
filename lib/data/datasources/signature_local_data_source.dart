@@ -39,11 +39,10 @@ class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
 
   @override
   Future<List<File>> getSavedSignatures() async {
-    final path = await _getDirectoryPath();
     final prefs = await SharedPreferences.getInstance();
     final fileNames = prefs.getStringList(_key) ?? [];
 
-    return fileNames.map((name) => File('$path/$name')).toList();
+    return fileNames.map((path) => File(path)).toList();
   }
 
   @override
