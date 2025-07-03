@@ -110,55 +110,51 @@ class _SignaturePageState extends State<SignaturePage> {
                             return Text('Tidak ada tanda tangan yang tersimpan');
                           }
                           if (state.savedSignatures != null) {
-                            return SizedBox(
-                              height: 500,
-                              child: ListView.builder(
-                                itemCount: state.savedSignatures!.length,
-                                itemBuilder: (context, index) {
-                                  final signature = state.savedSignatures![index];
-                                  return Card(
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Image.file(signature, fit: BoxFit.scaleDown),
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: state.savedSignatures!.length,
+                              itemBuilder: (context, index) {
+                                final signature = state.savedSignatures![index];
+                                return Card(
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Image.file(signature, fit: BoxFit.scaleDown),
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder:
+                                                  (_) => AlertDialog(
+                                                    title: const Text('Hapus Tanda Tangan'),
+                                                    content: const Text('Yakin ingin menghapus tanda tangan ini?'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () => Navigator.pop(context),
+                                                        child: const Text('Batal'),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {},
+                                                        child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+                                                      ),
+                                                    ],
+                                                  ),
+                                            );
+                                          },
                                         ),
-                                        Positioned(
-                                          top: 4,
-                                          right: 4,
-                                          child: IconButton(
-                                            icon: const Icon(Icons.delete, color: Colors.red),
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (_) => AlertDialog(
-                                                      title: const Text('Hapus Tanda Tangan'),
-                                                      content: const Text('Yakin ingin menghapus tanda tangan ini?'),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () => Navigator.pop(context),
-                                                          child: const Text('Batal'),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () {},
-                                                          child: const Text(
-                                                            'Hapus',
-                                                            style: TextStyle(color: Colors.red),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             );
                           }
                           return const Text('Belum ada tanda tangan yang tersimpan');
