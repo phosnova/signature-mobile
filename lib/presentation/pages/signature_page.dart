@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:signature/signature.dart';
 
 import '../../core/enums/signature_status.dart';
+import '../../domain/entities/signature.dart';
 import '../../injection.dart';
 import '../bloc/sign/sign_bloc.dart';
 import 'signature_canvas.dart';
@@ -116,44 +118,7 @@ class _SignaturePageState extends State<SignaturePage> {
                               itemCount: state.savedSignatures!.length,
                               itemBuilder: (context, index) {
                                 final signature = state.savedSignatures![index];
-                                return Card(
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.file(signature, fit: BoxFit.scaleDown),
-                                      ),
-                                      Positioned(
-                                        top: 4,
-                                        right: 4,
-                                        child: IconButton(
-                                          icon: const Icon(Icons.delete, color: Colors.red),
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder:
-                                                  (_) => AlertDialog(
-                                                    title: const Text('Hapus Tanda Tangan'),
-                                                    content: const Text('Yakin ingin menghapus tanda tangan ini?'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () => Navigator.pop(context),
-                                                        child: const Text('Batal'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {},
-                                                        child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-                                                      ),
-                                                    ],
-                                                  ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                return SignatureCard(sign: signature!);
                               },
                             );
                           }
@@ -167,6 +132,50 @@ class _SignaturePageState extends State<SignaturePage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class SignatureCard extends StatelessWidget {
+  final Sign sign;
+  const SignatureCard({required this.sign, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child:
+                sign.image != null
+                    ? Image.file(sign.image!, fit: BoxFit.scaleDown)
+                    : Text("Gambar kosong/tidak tersimpan!"),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder:
+                      (_) => AlertDialog(
+                        title: const Text('Hapus Tanda Tangan'),
+                        content: const Text('Yakin ingin menghapus tanda tangan ini?'),
+                        actions: [
+                          TextButton(onPressed: () => context.pop(), child: const Text('Batal')),
+                          TextButton(onPressed: null, child: const Text('Hapus', style: TextStyle(color: Colors.red))),
+                        ],
+                      ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

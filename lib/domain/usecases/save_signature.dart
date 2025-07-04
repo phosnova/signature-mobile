@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
 
+import '../entities/signature.dart';
 import '../repositories/signature_repository.dart';
 
 @lazySingleton
@@ -9,5 +10,7 @@ class SaveSignature {
   final SignatureRepository signatureRepository;
   SaveSignature(this.signatureRepository);
 
-  Future<bool> call(Uint8List imageBytes) => signatureRepository.saveSignature(imageBytes);
+  Future<Sign?> call(Uint8List imageBytes) {
+    return signatureRepository.saveSignature(imageBytes).then((result) => result);
+  }
 }

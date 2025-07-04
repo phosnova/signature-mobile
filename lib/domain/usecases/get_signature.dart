@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:injectable/injectable.dart';
 
+import '../entities/signature.dart';
 import '../repositories/signature_repository.dart';
 
 @lazySingleton
@@ -9,5 +8,5 @@ class GetSignature {
   final SignatureRepository signatureRepository;
   GetSignature(this.signatureRepository);
 
-  Future<List<File>> call() => signatureRepository.getSavedSignatures();
+  Future<List<Sign?>> call() async => await signatureRepository.getSavedSignatures().then((result) => result);
 }

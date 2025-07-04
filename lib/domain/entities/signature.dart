@@ -1,12 +1,12 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'signature.freezed.dart';
 
 @freezed
-abstract class Signature with _$Signature {
-  const factory Signature({Uint8List? imageBytes}) = _Signature;
+abstract class Sign with _$Sign {
+  const factory Sign({File? image, String? fileName, String? filePath}) = _Sign;
 
-  const Signature._(); // Private constructor
+  const Sign._(); // Private constructor
 }

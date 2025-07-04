@@ -4,9 +4,11 @@ import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/signature_model.dart';
+
 abstract class SignatureLocalDataSource {
-  Future<bool> saveSignature(Uint8List imageBytes);
-  Future<List<File>> getSavedSignatures();
+  Future<SignatureModel?> saveSignature(Uint8List imageBytes);
+  Future<List<SignatureModel?>> getSavedSignatures();
   Future<bool> deleteSignature(String fileName);
 }
 
@@ -20,29 +22,35 @@ class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
   }
 
   @override
-  Future<bool> saveSignature(Uint8List imageBytes) async {
+  Future<SignatureModel?> saveSignature(Uint8List imageBytes) async {
     try {
       final path = await _getDirectoryPath();
       final file = File('$path/${DateTime.now().millisecondsSinceEpoch}.png');
       await file.writeAsBytes(imageBytes);
+
       final prefs = await SharedPreferences.getInstance();
-      final files = prefs.getStringList(_key) ?? [];
+      final paths = prefs.getStringList(_key) ?? [];
 
-      files.add(file.path);
+      paths.add(file.path);
+      await prefs.setStringList(_key, paths);
 
-      await prefs.setStringList(_key, files);
-      return true;
+      return SignatureModel(image: file, fileName: file.path);
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
   @override
-  Future<List<File>> getSavedSignatures() async {
+  Future<List<SignatureModel?>> getSavedSignatures() async {
     final prefs = await SharedPreferences.getInstance();
     final fileNames = prefs.getStringList(_key) ?? [];
 
-    return fileNames.map((path) => File(path)).toList();
+    final signatures =
+        fileNames
+            .map((fileName) => SignatureModel(image: File(fileName), fileName: fileName, filePath: fileName))
+            .toList();
+
+    return signatures;
   }
 
   @override

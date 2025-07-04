@@ -1,8 +1,9 @@
-import 'dart:io';
 import 'dart:typed_data';
 
+import '../entities/signature.dart';
+
 abstract class SignatureRepository {
-  Future<bool> saveSignature(Uint8List imageBytes);
-  Future<List<File>> getSavedSignatures();
+  Future<Sign?> saveSignature(Uint8List imageBytes);
+  Future<List<Sign?>> getSavedSignatures();
   Future<bool> deleteSignature(String fileName);
 }
