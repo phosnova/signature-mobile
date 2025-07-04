@@ -115,6 +115,7 @@ class _SignaturePageState extends State<SignaturePage> {
                             return ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
+                              reverse: true,
                               itemCount: state.savedSignatures!.length,
                               itemBuilder: (context, index) {
                                 final signature = state.savedSignatures![index];
@@ -168,7 +169,13 @@ class SignatureCard extends StatelessWidget {
                         content: const Text('Yakin ingin menghapus tanda tangan ini?'),
                         actions: [
                           TextButton(onPressed: () => context.pop(), child: const Text('Batal')),
-                          TextButton(onPressed: null, child: const Text('Hapus', style: TextStyle(color: Colors.red))),
+                          TextButton(
+                            onPressed: () {
+                              getIt<SignBloc>().add(SignEvent.delete(sign.fileName!));
+                              context.pop();
+                            },
+                            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+                          ),
                         ],
                       ),
                 );
