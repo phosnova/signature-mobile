@@ -21,7 +21,6 @@ class _SignaturePageState extends State<SignaturePage> {
 
   @override
   void initState() {
-    getIt.call<SignBloc>().add(const SignEvent.started());
     signatureController = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
     super.initState();
   }
@@ -61,7 +60,7 @@ class _SignaturePageState extends State<SignaturePage> {
           if (state.status.isSuccess) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(const SnackBar(content: Text('Berhasil menyimpan tanda tangan')));
+            ).showSnackBar(SnackBar(content: Text(state.message ?? 'Berhasil menyimpan tanda tangan')));
           }
           if (state.status.isFailure) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal menyimpan tanda tangan')));

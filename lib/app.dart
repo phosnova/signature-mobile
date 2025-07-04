@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => getIt<SignBloc>())],
+      providers: [BlocProvider(create: (context) => getIt<SignBloc>()..add(const SignEvent.started()))],
       child: MaterialApp.router(
         title: MyAppConfig.appName,
         theme: ThemeData(
