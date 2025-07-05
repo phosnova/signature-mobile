@@ -8,7 +8,7 @@ import '../models/signature_model.dart';
 
 abstract class SignatureLocalDataSource {
   Future<SignatureModel?> saveSignature(Uint8List imageBytes);
-  Future<List<SignatureModel?>> getSavedSignatures();
+  Future<List<SignatureModel>?> getSavedSignatures();
   Future<bool> deleteSignature(String fileName);
 }
 
@@ -41,7 +41,7 @@ class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
   }
 
   @override
-  Future<List<SignatureModel?>> getSavedSignatures() async {
+  Future<List<SignatureModel>?> getSavedSignatures() async {
     final prefs = await SharedPreferences.getInstance();
     final fileNames = prefs.getStringList(_key) ?? [];
 

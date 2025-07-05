@@ -18,13 +18,13 @@ class SignatureRepositoryImpl implements SignatureRepository {
   }
 
   @override
-  Future<List<Sign?>> getSavedSignatures() async {
+  Future<List<Sign>?> getSavedSignatures() async {
     try {
       final result = await signatureLocalDataSource.getSavedSignatures();
 
-      if (result.isEmpty) return [];
+      if (result == null) return [];
 
-      return result.map((e) => e?.toDomain()).toList();
+      return result.map((e) => e.toDomain()).toList();
     } catch (e) {
       rethrow;
     }

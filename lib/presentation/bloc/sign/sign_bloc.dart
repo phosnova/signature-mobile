@@ -34,7 +34,7 @@ class SignBloc extends Bloc<SignEvent, SignState> {
     emit(state.copyWith(status: SignatureStatus.initial, message: "Mengambil Data Tanda Tangan..."));
     final image = await getSignature.call();
 
-    if (image.isEmpty) {
+    if (image == null) {
       emit(
         state.copyWith(
           savedSignatures: null,
@@ -82,14 +82,17 @@ class SignBloc extends Bloc<SignEvent, SignState> {
   Future<void> _handleDelete(Emitter<SignState> emit, String fileName) async {
     emit(state.copyWith(status: SignatureStatus.loading, message: "Menghapus Tanda Tangan..."));
     final result = await deleteSignature(fileName);
+
     if (!result) {
       emit(state.copyWith(status: SignatureStatus.failure, message: 'Gagal Menghapus Tanda Tangan'));
       return Future.value();
     }
-    final signatures = await getSignature.call();
+
+    final updatedSignatures = List<Sign>.from(state.savedSignatures ?? [])..removeWhere((s) => s.fileName == fileName);
+
     emit(
       state.copyWith(
-        savedSignatures: signatures,
+        savedSignatures: updatedSignatures,
         status: SignatureStatus.success,
         message: 'Tanda Tangan Berhasil Dihapus',
       ),

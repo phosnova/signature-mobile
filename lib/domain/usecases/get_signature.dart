@@ -8,5 +8,5 @@ class GetSignature {
   final SignatureRepository signatureRepository;
   GetSignature(this.signatureRepository);
 
-  Future<List<Sign?>> call() async => await signatureRepository.getSavedSignatures().then((result) => result);
+  Future<List<Sign>?> call() async => await signatureRepository.getSavedSignatures();
 }
