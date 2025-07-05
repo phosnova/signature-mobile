@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
                     children: [
                       ElevatedButton(onPressed: () => goRouter.push('/signature'), child: Text('buat tanda tangan')),
                       SizedBox(width: 8),
-                      ElevatedButton(onPressed: null, child: Text('Impor dan Edit PDF')),
+                      ElevatedButton(onPressed: () => goRouter.push('/pdf'), child: Text('Impor dan Edit PDF')),
                       SizedBox(width: 8),
                       ElevatedButton(onPressed: null, child: Text('Data Tanda Tangan')),
                       SizedBox(width: 8),

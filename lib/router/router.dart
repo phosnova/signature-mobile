@@ -4,6 +4,7 @@ import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/errors/not_found_page.dart';
 import '../presentation/pages/home_page.dart';
+import '../presentation/pages/pdf_page.dart';
 import '../presentation/pages/profile_page.dart';
 import '../presentation/pages/signature_page.dart';
 import 'router_item.dart';
@@ -30,6 +31,7 @@ final goRouter = GoRouter(
       name: AppRouter.signature.name,
       builder: (context, state) => const SignaturePage(),
     ),
+    GoRoute(path: AppRouter.pdf.path, name: AppRouter.pdf.name, builder: (context, state) => const PdfPage()),
     GoRoute(
       path: AppRouter.notFound.path,
       name: AppRouter.notFound.name,

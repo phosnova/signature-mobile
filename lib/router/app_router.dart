@@ -12,6 +12,8 @@ class AppRouter {
 
   static const signature = RouteItem(name: 'signature', path: '/signature');
 
+  static const pdf = RouteItem(name: 'pdf', path: '/pdf');
+
   // Not Found Route
   static const notFound = RouteItem(name: 'not_found', path: '/not_found');
 
