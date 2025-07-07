@@ -29,6 +29,7 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
         signatureScaleChanged: (scale) => _handleSignatureScaleChanged(emit, scale),
         pdfPageChanged: (page) => _handlePdfPageChanged(emit, page),
         selectedSignature: (sign) => _handleSelectedSignature(emit, sign),
+        pdfPageSizeChanged: (pageSize, ratio) => _handlePdfPageSizeChanged(emit, pageSize, ratio),
       );
     });
   }
@@ -58,15 +59,25 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
     }
 
     final pdfFile = File(file.path!);
-    final pdfBytes = await pdfFile.readAsBytes();
-    final pdfDoc = PdfDocument(inputBytes: pdfBytes);
-    final firstPage = pdfDoc.pages[0];
-    final pageSize = Size(firstPage.size.width, firstPage.size.height);
 
-    emit(state.copyWith(pdfFile: pdfFile, pdfPageSize: pageSize, message: null));
+    emit(state.copyWith(pdfFile: pdfFile, message: null));
   }
 
-  Future<void> _handleSaveFile(Emitter<PdfState> emit, File file) async {}
+  Future<void> _handleSaveFile(Emitter<PdfState> emit, File file) async {
+    final List<int> inputBytes = state.pdfFile!.readAsBytesSync();
+    final PdfDocument pdf = PdfDocument(inputBytes: inputBytes);
+
+    final PdfPage page = pdf.pages[state.pdfPage];
+    final PdfBitmap signatureImage = PdfBitmap(state.selectedSignature!.image!.readAsBytesSync());
+
+    page.graphics.drawImage(
+      signatureImage,
+      Rect.fromLTWH(state.signaturePosition.dx, state.signaturePosition.dy, 100, 300),
+    );
+
+    final List<int> outputBytes = await pdf.save();
+    pdf.dispose();
+  }
 
   Future<void> _handleDeleteFile(Emitter<PdfState> emit, String fileName) async {}
 
@@ -84,5 +95,9 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
 
   Future<void> _handleSelectedSignature(Emitter<PdfState> emit, Sign signature) async {
     emit(state.copyWith(selectedSignature: signature));
+  }
+
+  Future<void> _handlePdfPageSizeChanged(Emitter<PdfState> emit, Size pageSize, ratio) async {
+    emit(state.copyWith(pdfPageSize: pageSize, pageRatio: ratio));
   }
 }

@@ -11,6 +11,7 @@ class PdfState with _$PdfState {
     required Offset signaturePosition,
     required int pdfPage,
     required double signatureScale,
+    required double pageRatio,
   }) = _Initial;
 
   factory PdfState.initial() => PdfState(
@@ -21,5 +22,6 @@ class PdfState with _$PdfState {
     pdfPage: 0,
     signatureScale: 1.0,
     signaturePosition: Offset(0, 0),
+    pageRatio: 1.0,
   );
 }

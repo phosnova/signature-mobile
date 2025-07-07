@@ -24,51 +24,67 @@ class _PdfPageState extends State<PdfPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit PDF')),
+      appBar: AppBar(
+        title: const Text('Edit PDF'),
+        actions: [Text('Simpan', style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.blueAccent))],
+        actionsPadding: EdgeInsets.only(right: 24),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
           child: BlocBuilder<PdfBloc, PdfState>(
             builder: (context, state) {
-              final pdfHeight = state.pdfPageSize.height;
-
               if (state.pdfFile == null) {
-                return ImportPdfSection(onTap: () => context.read<PdfBloc>().add(PdfEvent.openFile()));
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ImportPdfSection(onTap: () => context.read<PdfBloc>().add(PdfEvent.openFile())),
+                );
               }
 
-              return ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-                child: Stack(
-                  children: [
-                    SfPdfViewer.file(
-                      state.pdfFile!,
-                      key: pdfViewerKey,
-                      controller: pdfViewerController,
-                      onPageChanged:
-                          (details) => context.read<PdfBloc>().add(PdfEvent.pdfPageChanged(details.newPageNumber - 1)),
-                    ),
-                    Positioned(
-                      left: state.signaturePosition.dx,
-                      top: state.signaturePosition.dy,
-                      child: GestureDetector(
-                        onPanUpdate:
-                            (details) => context.read<PdfBloc>().add(
-                              PdfEvent.signaturePositionChanged(details.delta.dx, details.delta.dy),
-                            ),
-                        child: Transform.scale(
-                          scale: state.signatureScale,
-                          child:
-                              state.selectedSignature != null
-                                  ? Image.file(
-                                    File(state.selectedSignature!.image!.path),
-                                    width: baseWidth,
-                                    height: baseHeight,
-                                  )
-                                  : Container(),
+              return Container(
+                padding: EdgeInsets.symmetric(vertical: 28.0),
+                height: MediaQuery.of(context).size.height * state.pageRatio,
+                child: Expanded(
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        child: SfPdfViewer.file(
+                          state.pdfFile!,
+                          key: pdfViewerKey,
+                          controller: pdfViewerController,
+                          pageLayoutMode: PdfPageLayoutMode.single,
+                          onDocumentLoaded: (details) {
+                            final ratio = details.document.pages[state.pdfPage].size.aspectRatio;
+                            final pageSize = details.document.pages[state.pdfPage].size;
+                            context.read<PdfBloc>().add(PdfEvent.pdfPageSizeChanged(pageSize, ratio));
+                          },
+                          onPageChanged:
+                              (details) =>
+                                  context.read<PdfBloc>().add(PdfEvent.pdfPageChanged(details.newPageNumber - 1)),
                         ),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        left: state.signaturePosition.dx,
+                        top: state.signaturePosition.dy,
+                        child: GestureDetector(
+                          onPanUpdate:
+                              (details) => context.read<PdfBloc>().add(
+                                PdfEvent.signaturePositionChanged(details.delta.dx, details.delta.dy),
+                              ),
+                          child: Transform.scale(
+                            scale: state.signatureScale,
+                            child:
+                                state.selectedSignature != null
+                                    ? Image.file(
+                                      File(state.selectedSignature!.image!.path),
+                                      width: baseWidth,
+                                      height: baseHeight,
+                                    )
+                                    : Container(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -76,7 +92,7 @@ class _PdfPageState extends State<PdfPage> {
         ),
       ),
       bottomSheet: Container(
-        height: 100,
+        height: 60,
         padding: EdgeInsets.all(8.0),
         decoration: const BoxDecoration(
           color: Colors.white,

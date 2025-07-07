@@ -11,4 +11,5 @@ class PdfEvent with _$PdfEvent {
   const factory PdfEvent.signatureScaleChanged(double scale) = _SignatureScaleChanged;
   const factory PdfEvent.pdfPageChanged(int page) = _PdfPageChanged;
   const factory PdfEvent.selectedSignature(Sign selectedSignature) = _SelectedSignature;
+  const factory PdfEvent.pdfPageSizeChanged(Size pageSize, double ratio) = _PdfPageSizeChanged;
 }
