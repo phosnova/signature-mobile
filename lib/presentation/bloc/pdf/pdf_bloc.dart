@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import '../../../domain/entities/signature.dart';
 import '../../../domain/usecases/get_signature.dart';
@@ -55,7 +57,13 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
       return;
     }
 
-    emit(state.copyWith(pdfFile: File(file.path!), message: null));
+    final pdfFile = File(file.path!);
+    final pdfBytes = await pdfFile.readAsBytes();
+    final pdfDoc = PdfDocument(inputBytes: pdfBytes);
+    final firstPage = pdfDoc.pages[0];
+    final pageSize = Size(firstPage.size.width, firstPage.size.height);
+
+    emit(state.copyWith(pdfFile: pdfFile, pdfPageSize: pageSize, message: null));
   }
 
   Future<void> _handleSaveFile(Emitter<PdfState> emit, File file) async {}
@@ -64,7 +72,9 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
 
   Future<void> _handleShareFile(Emitter<PdfState> emit, File file) async {}
 
-  Future<void> _handleSingaturePositionChanged(Emitter<PdfState> emit, double dx, double dy) async {}
+  Future<void> _handleSingaturePositionChanged(Emitter<PdfState> emit, double dx, double dy) async {
+    emit(state.copyWith(signaturePosition: Offset(state.signaturePosition.dx + dx, state.signaturePosition.dy + dy)));
+  }
 
   Future<void> _handleSignatureScaleChanged(Emitter<PdfState> emit, double scale) async {}
 

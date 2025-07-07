@@ -23,58 +23,55 @@ class _PdfPageState extends State<PdfPage> {
 
   @override
   Widget build(BuildContext context) {
-    final pdfHeight = MediaQuery.of(context).size.height * 0.7;
     return Scaffold(
       appBar: AppBar(title: const Text('Edit PDF')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: pdfHeight),
-            child: BlocBuilder<PdfBloc, PdfState>(
-              builder: (context, state) {
-                if (state.pdfFile == null) {
-                  return ImportPdfSection(onTap: () => context.read<PdfBloc>().add(PdfEvent.openFile()));
-                }
+          child: BlocBuilder<PdfBloc, PdfState>(
+            builder: (context, state) {
+              final pdfHeight = state.pdfPageSize.height;
 
-                return SizedBox(
-                  height: pdfHeight,
-                  child: Stack(
-                    children: [
-                      SfPdfViewer.file(
-                        state.pdfFile!,
-                        key: pdfViewerKey,
-                        controller: pdfViewerController,
-                        onPageChanged:
-                            (details) =>
-                                context.read<PdfBloc>().add(PdfEvent.pdfPageChanged(details.newPageNumber - 1)),
-                      ),
-                      Positioned(
-                        child: GestureDetector(
-                          onPanUpdate:
-                              (details) => context.read<PdfBloc>().add(
-                                PdfEvent.signaturePositionChanged(details.delta.dx, details.delta.dy),
-                              ),
-                          // onScaleUpdate:
-                          //     (details) => context.read<PdfBloc>().add(PdfEvent.signatureScaleChanged(details.scale)),
-                          child: Transform.scale(
-                            scale: state.signatureScale,
-                            child:
-                                state.selectedSignature != null
-                                    ? Image.file(
-                                      File(state.selectedSignature!.image!.path),
-                                      width: baseWidth,
-                                      height: baseHeight,
-                                    )
-                                    : Container(),
-                          ),
+              if (state.pdfFile == null) {
+                return ImportPdfSection(onTap: () => context.read<PdfBloc>().add(PdfEvent.openFile()));
+              }
+
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+                child: Stack(
+                  children: [
+                    SfPdfViewer.file(
+                      state.pdfFile!,
+                      key: pdfViewerKey,
+                      controller: pdfViewerController,
+                      onPageChanged:
+                          (details) => context.read<PdfBloc>().add(PdfEvent.pdfPageChanged(details.newPageNumber - 1)),
+                    ),
+                    Positioned(
+                      left: state.signaturePosition.dx,
+                      top: state.signaturePosition.dy,
+                      child: GestureDetector(
+                        onPanUpdate:
+                            (details) => context.read<PdfBloc>().add(
+                              PdfEvent.signaturePositionChanged(details.delta.dx, details.delta.dy),
+                            ),
+                        child: Transform.scale(
+                          scale: state.signatureScale,
+                          child:
+                              state.selectedSignature != null
+                                  ? Image.file(
+                                    File(state.selectedSignature!.image!.path),
+                                    width: baseWidth,
+                                    height: baseHeight,
+                                  )
+                                  : Container(),
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -126,7 +123,6 @@ class ImportPdfSection extends StatelessWidget {
       borderRadius: BorderRadius.circular(8.0),
       onTap: onTap,
       child: Container(
-        height: 100,
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
