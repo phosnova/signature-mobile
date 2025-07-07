@@ -118,7 +118,10 @@ class _SignaturePageState extends State<SignaturePage> {
                               itemCount: state.savedSignatures!.length,
                               itemBuilder: (context, index) {
                                 final signature = state.savedSignatures![index];
-                                return SignatureCard(sign: signature!);
+                                return SignatureCard(
+                                  sign: signature,
+                                  onPressed: () => getIt<SignBloc>().add(SignEvent.delete(signature.fileName!)),
+                                );
                               },
                             );
                           }
@@ -139,7 +142,8 @@ class _SignaturePageState extends State<SignaturePage> {
 
 class SignatureCard extends StatelessWidget {
   final Sign sign;
-  const SignatureCard({required this.sign, super.key});
+  final void Function()? onPressed;
+  const SignatureCard({required this.onPressed, required this.sign, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -157,29 +161,29 @@ class SignatureCard extends StatelessWidget {
           Positioned(
             top: 4,
             right: 4,
-            child: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder:
-                      (_) => AlertDialog(
-                        title: const Text('Hapus Tanda Tangan'),
-                        content: const Text('Yakin ingin menghapus tanda tangan ini?'),
-                        actions: [
-                          TextButton(onPressed: () => context.pop(), child: const Text('Batal')),
-                          TextButton(
-                            onPressed: () {
-                              getIt<SignBloc>().add(SignEvent.delete(sign.fileName!));
-                              context.pop();
-                            },
-                            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-                          ),
-                        ],
-                      ),
-                );
-              },
-            ),
+            child:
+                onPressed == null
+                    ? const SizedBox()
+                    : IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text('Hapus Tanda Tangan'),
+                                content: const Text('Yakin ingin menghapus tanda tangan ini?'),
+                                actions: [
+                                  TextButton(onPressed: () => context.pop(), child: const Text('Batal')),
+                                  TextButton(
+                                    onPressed: onPressed,
+                                    child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                        );
+                      },
+                    ),
           ),
         ],
       ),

@@ -101,7 +101,7 @@ class _PdfPageState extends State<PdfPage> {
                       borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(color: isSelected ? Colors.blue : Colors.grey, width: isSelected ? 3.0 : 1.0),
                     ),
-                    child: SignatureCard(sign: signature),
+                    child: SignatureCard(sign: signature, onPressed: null),
                   ),
                 );
               },
