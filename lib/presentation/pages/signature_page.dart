@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:signature/signature.dart';
 
 import '../../core/enums/signature_status.dart';
-import '../../domain/entities/signature.dart';
+import '../../domain/entities/local_file.dart';
 import '../../injection.dart';
 import '../bloc/sign/sign_bloc.dart';
 import 'signature_canvas.dart';
@@ -141,7 +141,7 @@ class _SignaturePageState extends State<SignaturePage> {
 }
 
 class SignatureCard extends StatelessWidget {
-  final Sign sign;
+  final LocalFile sign;
   final void Function()? onPressed;
   const SignatureCard({required this.onPressed, required this.sign, super.key});
 
@@ -154,8 +154,8 @@ class SignatureCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child:
-                sign.image != null
-                    ? Image.file(sign.image!, fit: BoxFit.scaleDown)
+                sign.file != null
+                    ? Image.file(sign.file!, fit: BoxFit.scaleDown)
                     : Text("Gambar kosong/tidak tersimpan!"),
           ),
           Positioned(

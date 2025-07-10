@@ -6,15 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/local_file_model.dart';
 
-abstract class SignatureLocalDataSource {
-  Future<LocalFileModel?> saveSignature(Uint8List imageBytes);
-  Future<List<LocalFileModel>?> getSavedSignatures();
-  Future<bool> deleteSignature(String fileName);
+abstract class PdfLocalDatasource {
+  Future<LocalFileModel?> savePdfFile(Uint8List bytes);
+  Future<List<LocalFileModel>?> getPdfBytes();
+  Future<bool> deletePdfFile(String fileName);
 }
 
-@LazySingleton(as: SignatureLocalDataSource)
-class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
-  static const _key = 'signature_files';
+@LazySingleton(as: PdfLocalDatasource)
+class PdfLocalDatasourceImpl extends PdfLocalDatasource {
+  static const _key = 'saved_pdf_files';
 
   Future<String> _getDirectoryPath() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -22,11 +22,12 @@ class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
   }
 
   @override
-  Future<LocalFileModel?> saveSignature(Uint8List imageBytes) async {
+  Future<LocalFileModel?> savePdfFile(Uint8List bytes) async {
     try {
       final path = await _getDirectoryPath();
-      final file = File('$path/${DateTime.now().millisecondsSinceEpoch}.png');
-      await file.writeAsBytes(imageBytes);
+      final fileName = 'signed_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final file = File('$path/$fileName');
+      await file.writeAsBytes(bytes, flush: true);
 
       final prefs = await SharedPreferences.getInstance();
       final paths = prefs.getStringList(_key) ?? [];
@@ -34,27 +35,24 @@ class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
       paths.add(file.path);
       await prefs.setStringList(_key, paths);
 
-      return LocalFileModel(file: file, fileName: file.path);
+      return LocalFileModel(file: file, fileName: fileName, filePath: file.path);
     } catch (e) {
       return null;
     }
   }
 
   @override
-  Future<List<LocalFileModel>?> getSavedSignatures() async {
+  Future<List<LocalFileModel>?> getPdfBytes() async {
     final prefs = await SharedPreferences.getInstance();
-    final fileNames = prefs.getStringList(_key) ?? [];
+    final paths = prefs.getStringList(_key) ?? [];
 
-    final signatures =
-        fileNames
-            .map((fileName) => LocalFileModel(file: File(fileName), fileName: fileName, filePath: fileName))
-            .toList();
-
-    return signatures;
+    return paths
+        .map((path) => LocalFileModel(file: File(path), fileName: path.split('/').last, filePath: path))
+        .toList();
   }
 
   @override
-  Future<bool> deleteSignature(String fileName) async {
+  Future<bool> deletePdfFile(String fileName) async {
     try {
       final path = await _getDirectoryPath();
       final file = File('$path/$fileName');
@@ -66,7 +64,7 @@ class SignatureLocalDataSourceImpl implements SignatureLocalDataSource {
       final prefs = await SharedPreferences.getInstance();
       final files = prefs.getStringList(_key) ?? [];
 
-      files.remove(fileName);
+      files.removeWhere((element) => element.endsWith(fileName));
 
       await prefs.setStringList(_key, files);
 

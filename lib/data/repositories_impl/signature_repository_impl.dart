@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
 
-import '../../domain/entities/signature.dart';
+import '../../domain/entities/local_file.dart';
 import '../../domain/repositories/signature_repository.dart';
 import '../datasources/signature_local_data_source.dart';
 
@@ -18,7 +18,7 @@ class SignatureRepositoryImpl implements SignatureRepository {
   }
 
   @override
-  Future<List<Sign>?> getSavedSignatures() async {
+  Future<List<LocalFile>?> getSavedSignatures() async {
     try {
       final result = await signatureLocalDataSource.getSavedSignatures();
 
@@ -31,7 +31,7 @@ class SignatureRepositoryImpl implements SignatureRepository {
   }
 
   @override
-  Future<Sign> saveSignature(Uint8List imageBytes) async {
+  Future<LocalFile> saveSignature(Uint8List imageBytes) async {
     try {
       final result = await signatureLocalDataSource.saveSignature(imageBytes);
 

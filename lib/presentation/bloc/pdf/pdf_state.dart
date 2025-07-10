@@ -4,8 +4,9 @@ part of 'pdf_bloc.dart';
 class PdfState with _$PdfState {
   const factory PdfState({
     required File? pdfFile,
-    List<Sign>? savedSignatures,
-    Sign? selectedSignature,
+    List<LocalFile>? savedSignatures,
+    LocalFile? selectedSignature,
+    List<LocalFile>? savedPdf,
     String? message,
     required Size pdfPageSize,
     required Offset signaturePosition,
@@ -17,6 +18,7 @@ class PdfState with _$PdfState {
   factory PdfState.initial() => PdfState(
     pdfFile: null,
     savedSignatures: [],
+    savedPdf: [],
     message: null,
     pdfPageSize: Size(0, 0),
     pdfPage: 0,

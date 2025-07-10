@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/enums/signature_status.dart';
-import '../../../domain/entities/signature.dart';
+import '../../../domain/entities/local_file.dart';
 import '../../../domain/usecases/delete_signature.dart';
 import '../../../domain/usecases/get_signature.dart';
 import '../../../domain/usecases/save_signature.dart';
@@ -68,7 +68,7 @@ class SignBloc extends Bloc<SignEvent, SignState> {
       return Future.value();
     }
 
-    final updatedSignatures = List<Sign>.from(state.savedSignatures ?? [])..add(result);
+    final updatedSignatures = List<LocalFile>.from(state.savedSignatures ?? [])..add(result);
 
     emit(
       state.copyWith(
@@ -88,7 +88,8 @@ class SignBloc extends Bloc<SignEvent, SignState> {
       return Future.value();
     }
 
-    final updatedSignatures = List<Sign>.from(state.savedSignatures ?? [])..removeWhere((s) => s.fileName == fileName);
+    final updatedSignatures = List<LocalFile>.from(state.savedSignatures ?? [])
+      ..removeWhere((s) => s.fileName == fileName);
 
     emit(
       state.copyWith(

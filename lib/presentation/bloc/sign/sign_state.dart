@@ -5,7 +5,7 @@ class SignState with _$SignState {
   const factory SignState({
     required Uint8List? signatureImage,
     required SignatureStatus status,
-    List<Sign>? savedSignatures,
+    List<LocalFile>? savedSignatures,
     String? message,
   }) = _SignState;
 

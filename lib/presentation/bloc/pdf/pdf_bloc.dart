@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
@@ -7,8 +8,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../domain/entities/signature.dart';
+import '../../../domain/entities/local_file.dart';
+import '../../../domain/usecases/get_pdf.dart';
 import '../../../domain/usecases/get_signature.dart';
+import '../../../domain/usecases/save_pdf.dart';
 
 part 'pdf_event.dart';
 part 'pdf_state.dart';
@@ -17,12 +20,14 @@ part 'pdf_bloc.freezed.dart';
 @lazySingleton
 class PdfBloc extends Bloc<PdfEvent, PdfState> {
   final GetSignature getSignature;
-  PdfBloc(this.getSignature) : super(PdfState.initial()) {
+  final SavePdf savePdf;
+  final GetPdf getPdf;
+  PdfBloc(this.getSignature, this.savePdf, this.getPdf) : super(PdfState.initial()) {
     on<PdfEvent>((event, emit) async {
       await event.when(
         started: () => _handleStarted(emit),
         openFile: () => _handleOpenFile(emit),
-        saveFile: (File file) => _handleSaveFile(emit, file),
+        saveFile: () => _handleSaveFile(emit),
         deleteFile: (String fileName) => _handleDeleteFile(emit, fileName),
         shareFile: (File file) => _handleShareFile(emit, file),
         signaturePositionChanged: (dx, dy) => _handleSingaturePositionChanged(emit, dx, dy),
@@ -30,6 +35,7 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
         pdfPageChanged: (page) => _handlePdfPageChanged(emit, page),
         selectedSignature: (sign) => _handleSelectedSignature(emit, sign),
         pdfPageSizeChanged: (pageSize, ratio) => _handlePdfPageSizeChanged(emit, pageSize, ratio),
+        getSavedPdf: () => _handleGetSavedPdf(emit),
       );
     });
   }
@@ -63,12 +69,12 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
     emit(state.copyWith(pdfFile: pdfFile, message: null));
   }
 
-  Future<void> _handleSaveFile(Emitter<PdfState> emit, File file) async {
+  Future<void> _handleSaveFile(Emitter<PdfState> emit) async {
     final List<int> inputBytes = state.pdfFile!.readAsBytesSync();
     final PdfDocument pdf = PdfDocument(inputBytes: inputBytes);
 
     final PdfPage page = pdf.pages[state.pdfPage];
-    final PdfBitmap signatureImage = PdfBitmap(state.selectedSignature!.image!.readAsBytesSync());
+    final PdfBitmap signatureImage = PdfBitmap(state.selectedSignature!.file!.readAsBytesSync());
 
     page.graphics.drawImage(
       signatureImage,
@@ -77,6 +83,18 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
 
     final List<int> outputBytes = await pdf.save();
     pdf.dispose();
+
+    final Uint8List uint8Output = Uint8List.fromList(outputBytes);
+
+    final result = await savePdf(uint8Output);
+
+    if (result == null) {
+      emit(state.copyWith(message: 'Gagal Menyimpan PDF'));
+      return Future.value();
+    }
+    final updatedPdfs = List<LocalFile>.from(state.savedPdf ?? [])..add(result);
+
+    emit(state.copyWith(savedPdf: updatedPdfs, message: 'PDF Berhasil Disimpan'));
   }
 
   Future<void> _handleDeleteFile(Emitter<PdfState> emit, String fileName) async {}
@@ -93,11 +111,22 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
     emit(state.copyWith(pdfPage: page));
   }
 
-  Future<void> _handleSelectedSignature(Emitter<PdfState> emit, Sign signature) async {
+  Future<void> _handleSelectedSignature(Emitter<PdfState> emit, LocalFile signature) async {
     emit(state.copyWith(selectedSignature: signature));
   }
 
   Future<void> _handlePdfPageSizeChanged(Emitter<PdfState> emit, Size pageSize, ratio) async {
     emit(state.copyWith(pdfPageSize: pageSize, pageRatio: ratio));
+  }
+
+  Future<void> _handleGetSavedPdf(Emitter<PdfState> emit) async {
+    final result = await getPdf();
+
+    if (result == null) {
+      emit(state.copyWith(savedPdf: null));
+      return;
+    }
+
+    emit(state.copyWith(savedPdf: result));
   }
 }
