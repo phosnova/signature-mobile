@@ -8,10 +8,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+import '../../../core/enums/edit_pdf_status.dart';
 import '../../../domain/entities/local_file.dart';
 import '../../../domain/usecases/get_pdf.dart';
 import '../../../domain/usecases/get_signature.dart';
 import '../../../domain/usecases/save_pdf.dart';
+import '../../../router/router.dart';
 
 part 'pdf_event.dart';
 part 'pdf_state.dart';
@@ -70,6 +72,8 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
   }
 
   Future<void> _handleSaveFile(Emitter<PdfState> emit) async {
+    emit(state.copyWith(message: 'Menyimpan PDF...', status: EditPdfStatus.loading));
+
     final List<int> inputBytes = state.pdfFile!.readAsBytesSync();
     final PdfDocument pdf = PdfDocument(inputBytes: inputBytes);
 
@@ -81,6 +85,9 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
       Rect.fromLTWH(state.signaturePosition.dx, state.signaturePosition.dy, 100, 300),
     );
 
+    emit(
+      state.copyWith(status: EditPdfStatus.mergePdfAndSignature, message: EditPdfStatus.mergePdfAndSignature.message),
+    );
     final List<int> outputBytes = await pdf.save();
     pdf.dispose();
 
@@ -89,12 +96,20 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
     final result = await savePdf(uint8Output);
 
     if (result == null) {
-      emit(state.copyWith(message: 'Gagal Menyimpan PDF'));
+      emit(state.copyWith(message: 'Gagal Menyimpan PDF', status: EditPdfStatus.failure));
       return Future.value();
     }
     final updatedPdfs = List<LocalFile>.from(state.savedPdf ?? [])..add(result);
 
-    emit(state.copyWith(savedPdf: updatedPdfs, message: 'PDF Berhasil Disimpan'));
+    emit(
+      state.copyWith(
+        savedPdf: updatedPdfs,
+        message: 'PDF Berhasil Disimpan',
+        status: EditPdfStatus.success,
+        pdfFile: null,
+      ),
+    );
+    goRouter.pop();
   }
 
   Future<void> _handleDeleteFile(Emitter<PdfState> emit, String fileName) async {}
