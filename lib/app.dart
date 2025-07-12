@@ -5,6 +5,7 @@ import 'core/app_config.dart';
 import 'core/themes/input_decoration_theme.dart';
 import 'injection.dart';
 import 'presentation/bloc/pdf/pdf_bloc.dart';
+import 'presentation/bloc/share_pdf/share_pdf_bloc.dart';
 import 'presentation/bloc/sign/sign_bloc.dart';
 import 'router/router.dart';
 
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => getIt<SignBloc>()..add(const SignEvent.started())),
         BlocProvider(create: (context) => getIt<PdfBloc>()..add(const PdfEvent.started())),
+        BlocProvider(create: (context) => getIt<SharePdfBloc>()..add(const SharePdfEvent.started())),
       ],
       child: MaterialApp.router(
         title: MyAppConfig.appName,

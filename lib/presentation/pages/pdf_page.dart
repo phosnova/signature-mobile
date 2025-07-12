@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+import '../../core/enums/edit_pdf_status.dart';
 import '../bloc/pdf/pdf_bloc.dart';
+import '../bloc/share_pdf/share_pdf_bloc.dart';
 import 'signature_page.dart';
 
 class PdfPage extends StatefulWidget {
@@ -34,63 +36,82 @@ class _PdfPageState extends State<PdfPage> {
         ],
         actionsPadding: EdgeInsets.only(right: 24),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: BlocBuilder<PdfBloc, PdfState>(
-            builder: (context, state) {
-              if (state.pdfFile == null) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ImportPdfSection(onTap: () => context.read<PdfBloc>().add(PdfEvent.openFile())),
-                );
-              }
+      body: BlocListener<PdfBloc, PdfState>(
+        listener: (context, state) {
+          if (state.status.isSuccess) {
+            showDialog(
+              context: context,
+              builder: (_) {
+                return const AlertDialog(content: Text('Berhasil menyimpan tanda tangan', textAlign: TextAlign.center));
+              },
+            );
+          }
+          if (state.status.isFailure) {
+            showDialog(
+              context: context,
+              builder:
+                  (_) => const AlertDialog(content: Text('Gagal menyimpan tanda tangan', textAlign: TextAlign.center)),
+            );
+          }
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: BlocBuilder<PdfBloc, PdfState>(
+              builder: (context, state) {
+                if (state.pdfFile == null) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ImportPdfSection(onTap: () => context.read<PdfBloc>().add(PdfEvent.openFile())),
+                  );
+                }
 
-              return Container(
-                padding: EdgeInsets.symmetric(vertical: 28.0),
-                height: MediaQuery.of(context).size.height * state.pageRatio,
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      child: SfPdfViewer.file(
-                        state.pdfFile!,
-                        key: pdfViewerKey,
-                        controller: pdfViewerController,
-                        pageLayoutMode: PdfPageLayoutMode.single,
-                        onDocumentLoaded: (details) {
-                          final ratio = details.document.pages[state.pdfPage].size.aspectRatio;
-                          final pageSize = details.document.pages[state.pdfPage].size;
-                          context.read<PdfBloc>().add(PdfEvent.pdfPageSizeChanged(pageSize, ratio));
-                        },
-                        onPageChanged:
-                            (details) =>
-                                context.read<PdfBloc>().add(PdfEvent.pdfPageChanged(details.newPageNumber - 1)),
-                      ),
-                    ),
-                    Positioned(
-                      left: state.signaturePosition.dx,
-                      top: state.signaturePosition.dy,
-                      child: GestureDetector(
-                        onPanUpdate:
-                            (details) => context.read<PdfBloc>().add(
-                              PdfEvent.signaturePositionChanged(details.delta.dx, details.delta.dy),
-                            ),
-                        child: Transform.scale(
-                          scale: state.signatureScale,
-                          child:
-                              state.selectedSignature != null
-                                  ? Image.file(
-                                    File(state.selectedSignature!.file!.path),
-                                    width: baseWidth,
-                                    height: baseHeight,
-                                  )
-                                  : Container(),
+                return Container(
+                  padding: EdgeInsets.symmetric(vertical: 28.0),
+                  height: MediaQuery.of(context).size.height * state.pageRatio,
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        child: SfPdfViewer.file(
+                          state.pdfFile!,
+                          key: pdfViewerKey,
+                          controller: pdfViewerController,
+                          pageLayoutMode: PdfPageLayoutMode.single,
+                          onDocumentLoaded: (details) {
+                            final ratio = details.document.pages[state.pdfPage].size.aspectRatio;
+                            final pageSize = details.document.pages[state.pdfPage].size;
+                            context.read<PdfBloc>().add(PdfEvent.pdfPageSizeChanged(pageSize, ratio));
+                          },
+                          onPageChanged:
+                              (details) =>
+                                  context.read<PdfBloc>().add(PdfEvent.pdfPageChanged(details.newPageNumber - 1)),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      Positioned(
+                        left: state.signaturePosition.dx,
+                        top: state.signaturePosition.dy,
+                        child: GestureDetector(
+                          onPanUpdate:
+                              (details) => context.read<PdfBloc>().add(
+                                PdfEvent.signaturePositionChanged(details.delta.dx, details.delta.dy),
+                              ),
+                          child: Transform.scale(
+                            scale: state.signatureScale,
+                            child:
+                                state.selectedSignature != null
+                                    ? Image.file(
+                                      File(state.selectedSignature!.file!.path),
+                                      width: baseWidth,
+                                      height: baseHeight,
+                                    )
+                                    : Container(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),

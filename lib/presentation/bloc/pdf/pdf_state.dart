@@ -6,7 +6,7 @@ class PdfState with _$PdfState {
     required File? pdfFile,
     List<LocalFile>? savedSignatures,
     LocalFile? selectedSignature,
-    List<LocalFile>? savedPdf,
+    LocalFile? updatedPdf,
     String? message,
     required EditPdfStatus status,
     required Size pdfPageSize,
@@ -19,7 +19,6 @@ class PdfState with _$PdfState {
   factory PdfState.initial() => PdfState(
     pdfFile: null,
     savedSignatures: [],
-    savedPdf: [],
     message: null,
     status: EditPdfStatus.initial,
     pdfPageSize: Size(0, 0),

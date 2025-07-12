@@ -5,6 +5,7 @@ extension PdfStatusX on EditPdfStatus {
   bool get isLoading => this == EditPdfStatus.loading;
   bool get isFailure => this == EditPdfStatus.failure;
   bool get isSuccess => this == EditPdfStatus.success;
+  bool get isProcess => this == EditPdfStatus.mergePdfAndSignature || this == EditPdfStatus.loading;
 }
 
 extension PdfStatusEx on EditPdfStatus {

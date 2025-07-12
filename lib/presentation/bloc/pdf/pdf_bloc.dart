@@ -30,14 +30,10 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
         started: () => _handleStarted(emit),
         openFile: () => _handleOpenFile(emit),
         saveFile: () => _handleSaveFile(emit),
-        deleteFile: (String fileName) => _handleDeleteFile(emit, fileName),
-        shareFile: (File file) => _handleShareFile(emit, file),
         signaturePositionChanged: (dx, dy) => _handleSingaturePositionChanged(emit, dx, dy),
-        signatureScaleChanged: (scale) => _handleSignatureScaleChanged(emit, scale),
         pdfPageChanged: (page) => _handlePdfPageChanged(emit, page),
         selectedSignature: (sign) => _handleSelectedSignature(emit, sign),
         pdfPageSizeChanged: (pageSize, ratio) => _handlePdfPageSizeChanged(emit, pageSize, ratio),
-        getSavedPdf: () => _handleGetSavedPdf(emit),
       );
     });
   }
@@ -99,28 +95,23 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
       emit(state.copyWith(message: 'Gagal Menyimpan PDF', status: EditPdfStatus.failure));
       return Future.value();
     }
-    final updatedPdfs = List<LocalFile>.from(state.savedPdf ?? [])..add(result);
 
     emit(
       state.copyWith(
-        savedPdf: updatedPdfs,
+        updatedPdf: result,
         message: 'PDF Berhasil Disimpan',
         status: EditPdfStatus.success,
         pdfFile: null,
       ),
     );
     goRouter.pop();
+
+    emit(state.copyWith(message: null, status: EditPdfStatus.initial, selectedSignature: null));
   }
-
-  Future<void> _handleDeleteFile(Emitter<PdfState> emit, String fileName) async {}
-
-  Future<void> _handleShareFile(Emitter<PdfState> emit, File file) async {}
 
   Future<void> _handleSingaturePositionChanged(Emitter<PdfState> emit, double dx, double dy) async {
     emit(state.copyWith(signaturePosition: Offset(state.signaturePosition.dx + dx, state.signaturePosition.dy + dy)));
   }
-
-  Future<void> _handleSignatureScaleChanged(Emitter<PdfState> emit, double scale) async {}
 
   Future<void> _handlePdfPageChanged(Emitter<PdfState> emit, int page) async {
     emit(state.copyWith(pdfPage: page));
@@ -132,16 +123,5 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
 
   Future<void> _handlePdfPageSizeChanged(Emitter<PdfState> emit, Size pageSize, ratio) async {
     emit(state.copyWith(pdfPageSize: pageSize, pageRatio: ratio));
-  }
-
-  Future<void> _handleGetSavedPdf(Emitter<PdfState> emit) async {
-    final result = await getPdf();
-
-    if (result == null) {
-      emit(state.copyWith(savedPdf: null));
-      return;
-    }
-
-    emit(state.copyWith(savedPdf: result));
   }
 }

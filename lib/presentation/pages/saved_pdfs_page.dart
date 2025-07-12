@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/pdf/pdf_bloc.dart';
+import '../../core/enums/share_pdf_status.dart';
+import '../bloc/share_pdf/share_pdf_bloc.dart';
 
 class SavedPdfsPage extends StatelessWidget {
   const SavedPdfsPage({super.key});
@@ -9,9 +10,25 @@ class SavedPdfsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Saved PDFs')),
+      appBar: AppBar(
+        title: const Text('Saved PDFs'),
+        actions: [
+          GestureDetector(
+            onTap: () => context.read<SharePdfBloc>().add(const SharePdfEvent.refresh()),
+            child: Padding(padding: const EdgeInsets.only(right: 16.0), child: Icon(Icons.refresh_rounded)),
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: BlocBuilder<PdfBloc, PdfState>(
+        child: BlocConsumer<SharePdfBloc, SharePdfState>(
+          listenWhen: (previous, current) => previous.savedPdf != current.savedPdf,
+          listener: (context, state) {
+            if (state.status?.isRefresh ?? false) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message ?? 'Berhasil Diperbarui'), duration: Duration(milliseconds: 500)),
+              );
+            }
+          },
           builder: (context, state) {
             final pdfs = state.savedPdf;
             if (pdfs == null) {
@@ -41,6 +58,9 @@ class SavedPdfsPage extends StatelessWidget {
                   ),
                   itemCount: pdfs.length,
                   itemBuilder: (context, index) {
+                    final reversedIndex = pdfs.length - 1 - index;
+                    final pdf = pdfs[reversedIndex];
+
                     return GestureDetector(
                       onTap: () {},
                       child: Container(
@@ -54,14 +74,19 @@ class SavedPdfsPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.picture_as_pdf, size: 48, color: Colors.red),
-                            const SizedBox(height: 12),
-                            Text(
-                              pdfs[index].fileName!,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            Expanded(child: const Icon(Icons.picture_as_pdf, size: 48, color: Colors.red)),
+                            Column(
+                              children: [
+                                Divider(color: Colors.grey.shade300),
+                                const SizedBox(height: 4.0),
+                                Text(
+                                  pdf.fileName!,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
                             ),
                           ],
                         ),
