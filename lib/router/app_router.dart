@@ -16,6 +16,8 @@ class AppRouter {
 
   static const savedPdf = RouteItem(name: 'saved-pdf', path: '/saved-pdf');
 
+  static const pdfViewer = RouteItem(name: 'pdf-viewer', path: '/pdf-viewer');
+
   // Not Found Route
   static const notFound = RouteItem(name: 'not_found', path: '/not_found');
 

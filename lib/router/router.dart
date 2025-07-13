@@ -5,6 +5,7 @@ import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/errors/not_found_page.dart';
 import '../presentation/pages/home_page.dart';
 import '../presentation/pages/pdf_page.dart';
+import '../presentation/pages/pdf_viewer_page.dart';
 import '../presentation/pages/profile_page.dart';
 import '../presentation/pages/saved_pdfs_page.dart';
 import '../presentation/pages/signature_page.dart';
@@ -36,6 +37,11 @@ final goRouter = GoRouter(
       path: AppRouter.savedPdf.path,
       name: AppRouter.savedPdf.name,
       builder: (context, state) => const SavedPdfsPage(),
+    ),
+    GoRoute(
+      path: AppRouter.pdfViewer.path,
+      name: AppRouter.pdfViewer.name,
+      builder: (context, state) => PdfViewerPage(filePath: state.extra as String),
     ),
     GoRoute(path: AppRouter.pdf.path, name: AppRouter.pdf.name, builder: (context, state) => const PdfPage()),
     GoRoute(

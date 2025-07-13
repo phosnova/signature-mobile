@@ -10,6 +10,7 @@ abstract class PdfLocalDatasource {
   Future<LocalFileModel?> savePdfFile(Uint8List bytes);
   Future<List<LocalFileModel>?> getPdfBytes();
   Future<bool> deletePdfFile(String fileName);
+  Future<bool> deleteMultiplePdfFiles(List<String> fileNames);
 }
 
 @LazySingleton(as: PdfLocalDatasource)
@@ -68,6 +69,30 @@ class PdfLocalDatasourceImpl extends PdfLocalDatasource {
 
       await prefs.setStringList(_key, files);
 
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> deleteMultiplePdfFiles(List<String> fileNames) async {
+    try {
+      final path = await _getDirectoryPath();
+      final prefs = await SharedPreferences.getInstance();
+      final files = prefs.getStringList(_key) ?? [];
+
+      for (final fileName in fileNames) {
+        final file = File('$path/$fileName');
+
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        files.removeWhere((element) => element.endsWith(fileName));
+      }
+
+      await prefs.setStringList(_key, files);
       return true;
     } catch (e) {
       return false;

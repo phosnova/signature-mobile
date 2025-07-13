@@ -41,4 +41,9 @@ class PdfRepositoryImpl implements PdfRepository {
   Future<bool> deletePdf(String fileName) {
     return _pdfLocalDataSource.deletePdfFile(fileName);
   }
+
+  @override
+  Future<bool> deleteMultiplePdfFiles(List<String> fileNames) {
+    return _pdfLocalDataSource.deleteMultiplePdfFiles(fileNames);
+  }
 }

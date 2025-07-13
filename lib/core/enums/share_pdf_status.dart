@@ -1,4 +1,4 @@
-enum SharePdfStatus { initial, loading, sharePdf, refresh, failure, success }
+enum SharePdfStatus { initial, loading, sharePdf, refresh, delete, failure, success }
 
 extension PdfStatusX on SharePdfStatus {
   bool get isInitial => this == SharePdfStatus.initial;
@@ -6,6 +6,7 @@ extension PdfStatusX on SharePdfStatus {
   bool get isFailure => this == SharePdfStatus.failure;
   bool get isSuccess => this == SharePdfStatus.success;
   bool get isRefresh => this == SharePdfStatus.refresh;
+  bool get isDelete => this == SharePdfStatus.delete;
   bool get isProcess => this == SharePdfStatus.sharePdf || this == SharePdfStatus.loading;
 }
 
@@ -20,6 +21,8 @@ extension PdfStatusEx on SharePdfStatus {
         return 'Mengirim PDF...';
       case SharePdfStatus.refresh:
         return 'Mengambil List PDF...';
+      case SharePdfStatus.delete:
+        return 'Menghapus PDF...';
       case SharePdfStatus.failure:
         return 'Gagal Mengirim PDF';
       case SharePdfStatus.success:

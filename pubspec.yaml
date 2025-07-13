@@ -54,6 +54,8 @@ dependencies:
   path_provider: ^2.1.5
   shared_preferences: ^2.5.3
   fluttertoast: ^8.2.12
+  font_awesome_flutter: ^10.5.0
+  share_plus: ^11.0.0
   
 
 dev_dependencies:
