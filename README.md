@@ -1,16 +1,30 @@
-# flutter_starter_kit
+# 📄 Aplikasi Tanda Tangan Digital
 
-A new Flutter project.
+Aplikasi Flutter untuk mengimpor, mengedit, membuat, dan membagikan dokumen PDF dengan fitur penempatan tanda tangan digital secara interaktif. Dibangun dengan fokus pada kemudahan penggunaan dan efisiensi bagi pengguna mobile.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Fitur Utama
 
-A few resources to get you started if this is your first Flutter project:
+- 🗂️ **Import PDF**  
+  Impor dokumen PDF dari perangkat lokal dan pratinjau di dalam aplikasi.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- ✍️ **Edit PDF (Tanda Tangan)**  
+  Tempatkan tanda tangan digital ke posisi yang diinginkan di dalam halaman PDF.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 🖋️ **Buat Tanda Tangan Sendiri**  
+  Gambar tanda tangan langsung di aplikasi dan simpan untuk digunakan kembali.
+
+- 📤 **Share PDF**  
+  Bagikan satu atau banyak dokumen PDF ke aplikasi lain (WhatsApp, Email, dll).
+
+- 🗑️ **Delete PDF**  
+  Hapus dokumen PDF dari aplikasi secara massal.
+
+---
+
+## 📲 Cuplikan Antarmuka
+
+| Import PDF | Pratinjau & Edit | Buat Tanda Tangan |
+|------------|------------------|--------------------|
+| ![Import](assets/screens/import.png) | ![Preview](assets/screens/preview.png) | ![Signature](assets/screens/signature.png) |
