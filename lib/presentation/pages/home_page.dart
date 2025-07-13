@@ -11,10 +11,7 @@ class HomePage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Beranda'),
-        actions: [IconButton(icon: const Icon(Icons.person_2_rounded), onPressed: () => context.push('/profile'))],
-      ),
+      appBar: AppBar(title: const Text('Beranda')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
