@@ -76,10 +76,13 @@ class PdfBloc extends Bloc<PdfEvent, PdfState> {
     final PdfPage page = pdf.pages[state.pdfPage];
     final PdfBitmap signatureImage = PdfBitmap(state.selectedSignature!.file!.readAsBytesSync());
 
-    page.graphics.drawImage(
-      signatureImage,
-      Rect.fromLTWH(state.signaturePosition.dx, state.signaturePosition.dy, 100, 300),
-    );
+    final realLeft = (state.signaturePosition.dx / state.pageRatio) * 1.2 + 75;
+    final realTop = (state.signaturePosition.dy / state.pageRatio) * 1.2;
+
+    final realWidth = 80.0;
+    final realHeight = 80.0;
+
+    page.graphics.drawImage(signatureImage, Rect.fromLTWH(realLeft, realTop, realWidth, realHeight));
 
     emit(
       state.copyWith(status: EditPdfStatus.mergePdfAndSignature, message: EditPdfStatus.mergePdfAndSignature.message),
